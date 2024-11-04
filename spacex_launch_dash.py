@@ -62,17 +62,26 @@ app.layout = html.Div(children=[
     Output(component_id='success-pie-chart', component_property='figure'),
     Input(component_id='site-dropdown', component_property='value')
 )
-def get_pie_chart(entered_site):
-    filtered_df = spacex_df
+
+def get_pie_chart(entered_site):    
     if entered_site == 'ALL':
-        fig = px.pie(filtered_df, values='class', 
-                     names='site', title=f'Launch Success Rate for {entered_site}')
+        # Group by site and count successes for all sites
+        fig = px.pie(spacex_df, values='class', names='Launch Site', 
+                     title='Launch Success Rate for All Sites')
     else:
-        filtered_df = filtered_df[filtered_df['site'] == entered_site]
-        fig = px.pie(filtered_df, values='class', 
-                     names='site', title=f'Launch Success Rate for {entered_site}')
+        # Filter for the selected site and count successes and failures
+        print(entered_site)
+        filtered_df = spacex_df[spacex_df['Launch Site'] == entered_site]
+        print(filtered_df['class'].value_counts())
+        value_counts = filtered_df['class'].value_counts().reset_index()
+        value_counts.columns = ['class', 'count']
+        
+        # Create pie chart with the count of successes and failures
+        fig = px.pie(value_counts, values='count', names='class', 
+                     title=f'Launch Success Rate for {entered_site}')
 
     return fig
+
 
 
 # TASK 4:
